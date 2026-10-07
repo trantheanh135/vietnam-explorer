@@ -50,7 +50,7 @@ spec:
         fsGroup: 1001   # the image's "app" user, so it can write to the uploads volume
       containers:
         - name: backend
-          image: ghcr.io/trantheanh135/vietnam-explorer-backend:latest
+          image: ghcr.io/trantheanh135/vietnam-explorer-backend:9ba98bb3e50c64658ba2417e7589a172199c3f7c
           ports:
             - containerPort: 8085
           envFrom:
