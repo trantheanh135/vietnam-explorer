@@ -1,0 +1,44 @@
+# Defaults are for local development (H2 file database, no Postgres needed).
+# In k8s the ConfigMap/Secret override these through environment variables.
+server:
+  port: 8085
+  forward-headers-strategy: none
+
+spring:
+  application:
+    name: vietnam-explorer-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/devdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  admin:
+    username: ${APP_ADMIN_USERNAME:admin}
+    password: ${APP_ADMIN_PASSWORD:}
+  jwt:
+    secret: ${APP_JWT_SECRET:dev-only-secret-change-me}
+    ttl-hours: 12
+  cors:
+    origins: ${APP_CORS_ORIGINS:http://localhost:5173,http://localhost:4173,https://vietnam-explorer-nu.vercel.app}
+  uploads:
+    dir: ${APP_UPLOADS_DIR:./data/uploads}
+    max-bytes: 8388608

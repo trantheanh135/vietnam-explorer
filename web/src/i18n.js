@@ -1,0 +1,36 @@
+export const T = {
+  appName: { en: 'Vietnam Explorer', vi: 'Khám phá Việt Nam' },
+  tagline: { en: 'Beautiful places & good food', vi: 'Cảnh đẹp & món ngon' },
+  travel: { en: 'Travel', vi: 'Du lịch' },
+  food: { en: 'Food', vi: 'Ẩm thực' },
+  travelIntro: { en: 'Breathtaking places across Vietnam', vi: 'Những miền đất đẹp nhất Việt Nam' },
+  foodIntro: { en: 'Dishes worth travelling for', vi: 'Những món ngon đáng để tìm đến' },
+  search: { en: 'Search places, dishes, cities…', vi: 'Tìm địa điểm, món ăn, thành phố…' },
+  allTypes: { en: 'All types', vi: 'Tất cả' },
+  results: { en: 'places', vi: 'địa điểm' },
+  dishes: { en: 'dishes', vi: 'món ngon' },
+  noResults: { en: 'No places match your search.', vi: 'Không tìm thấy địa điểm phù hợp.' },
+  bestTime: { en: 'Best time to visit', vi: 'Thời điểm đẹp nhất' },
+  mustTry: { en: 'Must try', vi: 'Nhất định phải thử' },
+  price: { en: 'Price', vi: 'Giá' },
+  ourRating: { en: 'Our rating', vi: 'Đánh giá' },
+  openMaps: { en: 'Open in Google Maps', vi: 'Mở Google Maps' },
+  directions: { en: 'Directions', vi: 'Chỉ đường' },
+  myReview: { en: 'Your notes', vi: 'Ghi chú của bạn' },
+  myNote: { en: 'Write a note (saved on this device)…', vi: 'Viết ghi chú (lưu trên thiết bị này)…' },
+  favourite: { en: 'Favourite', vi: 'Yêu thích' },
+  visited: { en: 'Been there', vi: 'Đã đến' },
+  favouritesOnly: { en: 'Favourites', vi: 'Yêu thích' },
+  back: { en: 'Back', vi: 'Quay lại' },
+  showMap: { en: 'Map', vi: 'Bản đồ' },
+  showList: { en: 'List', vi: 'Danh sách' },
+  offline: { en: 'You are offline — the list works, the map needs internet.', vi: 'Bạn đang offline — danh sách vẫn dùng được, bản đồ cần Internet.' },
+  approx: { en: 'Pin is approximate — Google Maps finds the exact address.', vi: 'Vị trí ghim là tương đối — Google Maps sẽ tìm địa chỉ chính xác.' },
+  install: { en: 'Install app', vi: 'Cài ứng dụng' },
+  photo: { en: 'Photo', vi: 'Ảnh' },
+  serverDown: { en: 'Showing saved data — the server is unreachable.', vi: 'Đang hiển thị dữ liệu đã lưu — chưa kết nối được máy chủ.' },
+}
+
+export function t(key, lang) {
+  return T[key]?.[lang] ?? key
+}

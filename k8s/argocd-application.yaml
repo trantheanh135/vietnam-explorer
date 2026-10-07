@@ -1,0 +1,22 @@
+# Apply once to the cluster: kubectl apply -f k8s/argocd-application.yaml
+# (not listed in kustomization.yaml on purpose)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vietnam-explorer
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/trantheanh135/vietnam-explorer
+    targetRevision: main
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vietnam-explorer
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

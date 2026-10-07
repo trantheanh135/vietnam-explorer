@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vietnam-explorer-config
+  namespace: vietnam-explorer
+data:
+  POSTGRES_DB: vietnam_explorer
+  POSTGRES_USER: postgres
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-service:5432/vietnam_explorer
+  SPRING_DATASOURCE_USERNAME: postgres
+  APP_ADMIN_USERNAME: admin
+  APP_CORS_ORIGINS: https://vietnam-explorer-nu.vercel.app,http://localhost:5173,http://localhost:4173
+  APP_UPLOADS_DIR: /data/uploads
