@@ -198,6 +198,16 @@ class ApiIntegrationTest {
     }
 
     @Test
+    void videoGenerationIsOffUntilConfigured() throws Exception {
+        String auth = login();
+        mvc.perform(get("/api/admin/video/config").header("Authorization", auth))
+                .andExpect(jsonPath("$.enabled").value(false))
+                .andExpect(jsonPath("$.missing").value("Gemini API key và Vercel Blob token"));
+        mvc.perform(post("/api/admin/places/ha-long-bay/video").header("Authorization", auth))
+                .andExpect(status().isServiceUnavailable());
+    }
+
+    @Test
     void allowsCorsFromTheApp() throws Exception {
         mvc.perform(options("/api/admin/places")
                         .header("Origin", "https://vietnam-explorer-nu.vercel.app")

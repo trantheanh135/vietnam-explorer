@@ -20,6 +20,7 @@ public class PlaceService {
 
     private final PlaceRepository repository;
     private final UploadService uploads;
+    private final VideoService videos;
 
     @Transactional(readOnly = true)
     public List<PlaceResponse> list(String category, boolean includeUnpublished) {
@@ -33,7 +34,7 @@ public class PlaceService {
                     ? repository.findByCategoryOrderBySortOrderAscCreatedAtAsc(category)
                     : repository.findByCategoryAndPublishedTrueOrderBySortOrderAscCreatedAtAsc(category);
         }
-        return places.stream().map(PlaceResponse::from).toList();
+        return places.stream().map(includeUnpublished ? PlaceResponse::from : PlaceResponse::publicView).toList();
     }
 
     @Transactional(readOnly = true)
@@ -41,7 +42,7 @@ public class PlaceService {
         Place p = repository.findById(id)
                 .filter(x -> includeUnpublished || x.isPublished())
                 .orElseThrow(() -> ApiException.notFound("Không tìm thấy địa điểm"));
-        return PlaceResponse.from(p);
+        return includeUnpublished ? PlaceResponse.from(p) : PlaceResponse.publicView(p);
     }
 
     @Transactional
@@ -73,6 +74,7 @@ public class PlaceService {
         repository.delete(p);
         repository.flush();
         if (p.getImageSrc() != null) deleteUploadIfUnused(p.getImageSrc());
+        videos.deleteVideoOf(p);
     }
 
     /** Seed import keeps the given order and ids. */

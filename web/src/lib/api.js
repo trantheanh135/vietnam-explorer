@@ -98,6 +98,11 @@ export const admin = {
   create: (token, place) => request('/admin/places', { method: 'POST', body: place, token }),
   update: (token, id, place) => request(`/admin/places/${encodeURIComponent(id)}`, { method: 'PUT', body: place, token }),
   remove: (token, id) => request(`/admin/places/${encodeURIComponent(id)}`, { method: 'DELETE', token }),
+  get: (token, id) => request(`/admin/places/${encodeURIComponent(id)}`, { token }),
+  videoConfig: (token) => request('/admin/video/config', { token }),
+  generateVideo: (token, id, prompt) =>
+    request(`/admin/places/${encodeURIComponent(id)}/video`, { method: 'POST', body: prompt ? { prompt } : {}, token, timeout: 90000 }),
+  deleteVideo: (token, id) => request(`/admin/places/${encodeURIComponent(id)}/video`, { method: 'DELETE', token }),
   upload: (token, blob, name = 'photo.jpg') => {
     const form = new FormData()
     form.append('file', blob, name)

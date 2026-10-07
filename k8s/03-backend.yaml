@@ -1,5 +1,5 @@
 # Requires Secret "vietnam-explorer-secret" (keys POSTGRES_PASSWORD, APP_ADMIN_PASSWORD,
-# APP_JWT_SECRET), created out-of-band, not in git.
+# APP_JWT_SECRET; optional APP_VIDEO_BLOB_TOKEN, APP_VIDEO_GEMINI_API_KEY), created out-of-band, not in git.
 # The image tag is updated automatically by .github/workflows/backend.yml.
 apiVersion: v1
 kind: Service
@@ -66,6 +66,13 @@ spec:
             - name: APP_JWT_SECRET
               valueFrom:
                 secretKeyRef: {name: vietnam-explorer-secret, key: APP_JWT_SECRET}
+            # AI video: both optional — generation is switched on once both keys exist.
+            - name: APP_VIDEO_BLOB_TOKEN
+              valueFrom:
+                secretKeyRef: {name: vietnam-explorer-secret, key: APP_VIDEO_BLOB_TOKEN, optional: true}
+            - name: APP_VIDEO_GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef: {name: vietnam-explorer-secret, key: APP_VIDEO_GEMINI_API_KEY, optional: true}
           volumeMounts:
             - name: uploads
               mountPath: /data/uploads

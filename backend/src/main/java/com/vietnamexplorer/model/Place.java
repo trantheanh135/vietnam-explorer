@@ -85,6 +85,24 @@ public class Place {
     @Column(length = 80)
     private String imageLicense;
 
+    /** AI video (Vercel Blob URL) and the state of its generation: none | generating | ready | failed. */
+    @Column(length = 600)
+    private String videoUrl;
+
+    @Column(length = 12)
+    private String videoStatus;
+
+    @Column(length = 400)
+    private String videoError;
+
+    @Column(length = 300)
+    private String videoOperation;
+
+    @Column(length = 80)
+    private String videoModel;
+
+    private Instant videoStartedAt;
+
     private boolean published = true;
 
     private int sortOrder;

@@ -1,4 +1,4 @@
-import { Check, Heart, MapPin, Star } from 'lucide-react'
+import { Check, Heart, MapPin, Play, Star } from 'lucide-react'
 import { REGIONS, title } from '../lib/places'
 import PlaceImage from './PlaceImage'
 
@@ -14,6 +14,7 @@ export default function PlaceCard({ place, lang, mine, selected, onSelect, onTog
         {place.category === 'food' && (
           <span className="badge rating"><Star size={12} fill="currentColor" strokeWidth={0} /> {place.rating.toFixed(1)}</span>
         )}
+        {place.video?.url && <span className="badge video"><Play size={11} fill="currentColor" strokeWidth={0} /> Video</span>}
         <button
           type="button"
           className={`fav-btn ${fav ? 'on' : ''}`}

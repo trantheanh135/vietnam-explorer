@@ -5,6 +5,8 @@ import com.vietnamexplorer.dto.PlaceRequest;
 import com.vietnamexplorer.dto.PlaceResponse;
 import com.vietnamexplorer.service.PlaceService;
 import com.vietnamexplorer.service.UploadService;
+import com.vietnamexplorer.service.VideoService;
+import com.vietnamexplorer.model.VideoJob;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /** Admin-only (guarded by AdminAuthInterceptor): manage places and reviews, upload photos. */
 @RestController
@@ -31,6 +34,7 @@ public class AdminController {
 
     private final PlaceService places;
     private final UploadService uploads;
+    private final VideoService videos;
 
     @GetMapping("/places")
     public List<PlaceResponse> list(@RequestParam(required = false) String category) {
@@ -57,6 +61,32 @@ public class AdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String id) {
         places.delete(id);
+    }
+
+    // ---- AI video ----
+
+    @GetMapping("/video/config")
+    public Map<String, Object> videoConfig() {
+        return videos.config();
+    }
+
+    @GetMapping("/video/jobs")
+    public List<VideoJob> videoJobs() {
+        return videos.recentJobs();
+    }
+
+    public record VideoRequest(String prompt) {
+    }
+
+    @PostMapping("/places/{id}/video")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PlaceResponse generateVideo(@PathVariable String id, @RequestBody(required = false) VideoRequest req) {
+        return PlaceResponse.from(videos.start(id, req == null ? null : req.prompt()));
+    }
+
+    @DeleteMapping("/places/{id}/video")
+    public PlaceResponse deleteVideo(@PathVariable String id) {
+        return PlaceResponse.from(videos.remove(id));
     }
 
     @PostMapping("/uploads")

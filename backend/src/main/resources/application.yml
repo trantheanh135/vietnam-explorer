@@ -42,3 +42,15 @@ app:
   uploads:
     dir: ${APP_UPLOADS_DIR:./data/uploads}
     max-bytes: 8388608
+  video:
+    gemini-api-key: ${APP_VIDEO_GEMINI_API_KEY:}
+    gemini-base-url: https://generativelanguage.googleapis.com
+    model: ${APP_VIDEO_MODEL:veo-3.1-lite-generate-preview}
+    resolution: 720p
+    duration-seconds: 8
+    price-per-second: ${APP_VIDEO_PRICE_PER_SECOND:0.05}   # Veo 3.1 Lite, 720p (Google price list, Oct 2026)
+    daily-limit: ${APP_VIDEO_DAILY_LIMIT:10}
+    blob-token: ${APP_VIDEO_BLOB_TOKEN:}
+    blob-api-url: https://vercel.com/api/blob
+    timeout-minutes: 15
+    poll-ms: 10000

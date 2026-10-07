@@ -28,6 +28,9 @@ export const T = {
   approx: { en: 'Pin is approximate — Google Maps finds the exact address.', vi: 'Vị trí ghim là tương đối — Google Maps sẽ tìm địa chỉ chính xác.' },
   install: { en: 'Install app', vi: 'Cài ứng dụng' },
   photo: { en: 'Photo', vi: 'Ảnh' },
+  aiVideo: { en: 'AI video from the real photo', vi: 'Video AI tạo từ ảnh thật' },
+  sound: { en: 'Sound', vi: 'Âm thanh' },
+  play: { en: 'Play video', vi: 'Phát video' },
   serverDown: { en: 'Showing saved data — the server is unreachable.', vi: 'Đang hiển thị dữ liệu đã lưu — chưa kết nối được máy chủ.' },
 }
 

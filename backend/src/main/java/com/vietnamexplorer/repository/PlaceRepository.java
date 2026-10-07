@@ -18,6 +18,8 @@ public interface PlaceRepository extends JpaRepository<Place, String> {
 
     long countByImageSrc(String imageSrc);
 
+    List<Place> findByVideoStatus(String videoStatus);
+
     @Query("select coalesce(max(p.sortOrder), 0) from Place p")
     int maxSortOrder();
 }

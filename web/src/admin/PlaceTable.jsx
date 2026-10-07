@@ -1,4 +1,4 @@
-import { EyeOff, Pencil, Search, Star, Trash2 } from 'lucide-react'
+import { Clapperboard, EyeOff, Loader2, Pencil, Search, Star, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import PlaceImage from '../components/PlaceImage'
 import { filterPlaces, REGIONS } from '../lib/places'
@@ -39,7 +39,11 @@ export default function PlaceTable({ places, onEdit, onDelete }) {
           <div key={p.id} className={`row ${p.published ? '' : 'is-hidden'}`}>
             <PlaceImage place={p} className="row-thumb" />
             <div className="row-main">
-              <strong>{p.nameVi}</strong>
+              <strong>
+                {p.nameVi}
+                {p.video?.url && <Clapperboard size={14} className="has-video" aria-label="có video" />}
+                {p.video?.status === 'generating' && <Loader2 size={14} className="spin has-video" aria-label="đang tạo video" />}
+              </strong>
               <span>{p.category === 'food' ? `${p.venue} · ${p.area}` : `${p.nameEn} · ${p.area}`}</span>
             </div>
             <span className={`badge region-${p.region}`}>{REGIONS[p.region].vi}</span>
