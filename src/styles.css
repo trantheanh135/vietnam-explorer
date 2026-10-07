@@ -145,10 +145,6 @@ a { color: var(--accent); }
 
 /* ---------- Map ---------- */
 .map-placeholder { height: 100%; display: grid; place-items: center; color: var(--muted); padding: 24px; text-align: center; }
-.map-note {
-  position: absolute; left: 10px; bottom: 22px; z-index: 500; background: rgba(255,255,255,.92); color: #333;
-  font-size: 11px; padding: 4px 8px; border-radius: 6px; max-width: 70%;
-}
 .view-toggle { display: none; }
 
 /* ---------- Mobile ---------- */

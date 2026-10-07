@@ -22,7 +22,6 @@ export const T = {
   showMap: { en: 'Map', vi: 'Bản đồ' },
   showList: { en: 'List', vi: 'Danh sách' },
   offline: { en: 'You are offline — the list works, the map needs internet.', vi: 'Bạn đang offline — danh sách vẫn dùng được, bản đồ cần Internet.' },
-  osmNote: { en: 'Map: OpenStreetMap (add a Google Maps API key to use Google Maps)', vi: 'Bản đồ: OpenStreetMap (thêm Google Maps API key để dùng Google Maps)' },
   approx: { en: 'Pin is approximate — Google Maps finds the exact address.', vi: 'Vị trí ghim là tương đối — Google Maps sẽ tìm địa chỉ chính xác.' },
   install: { en: 'Install app', vi: 'Cài ứng dụng' },
   updated: { en: 'A new version is available.', vi: 'Đã có phiên bản mới.' },

@@ -36,10 +36,7 @@ export default function MapView({ online, lang, ...props }) {
         {GOOGLE_KEY ? (
           <GoogleMapView apiKey={GOOGLE_KEY} lang={lang} {...props} />
         ) : (
-          <>
-            <LeafletMapView lang={lang} {...props} />
-            <div className="map-note">{t('osmNote', lang)}</div>
-          </>
+          <LeafletMapView lang={lang} {...props} />
         )}
       </Suspense>
     </MapErrorBoundary>
