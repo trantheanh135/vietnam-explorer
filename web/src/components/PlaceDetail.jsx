@@ -13,7 +13,7 @@ export default function PlaceDetail({ place, lang, review, onReview, onBack }) {
   return (
     <article className={`detail ${place.category}`}>
       <div className="detail-hero">
-        <PlaceImage place={place} eager />
+        <PlaceImage place={place} eager animated />
         {place.video?.url && <PlaceVideo url={place.video.url} lang={lang} />}
         <button type="button" className="round-btn back" onClick={onBack} aria-label={t('back', lang)}>
           <ArrowLeft size={20} />

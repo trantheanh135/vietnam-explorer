@@ -158,6 +158,18 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .pimg.food .pimg-placeholder { color: var(--food); background: linear-gradient(135deg, var(--food-soft), color-mix(in srgb, var(--food) 20%, var(--surface))); }
 .pimg.travel .pimg-placeholder { color: var(--travel); background: linear-gradient(135deg, var(--travel-soft), color-mix(in srgb, var(--travel) 20%, var(--surface))); }
 
+/* ---------- Animated photos (Ken Burns: slow zoom + pan) ---------- */
+.kb img.is-loaded { animation: 20s ease-in-out infinite alternate both; will-change: transform; }
+.kb-1 img.is-loaded { animation-name: kb-zoom-in-left; }
+.kb-2 img.is-loaded { animation-name: kb-zoom-in-right; }
+.kb-3 img.is-loaded { animation-name: kb-zoom-out-up; }
+.kb-4 img.is-loaded { animation-name: kb-pan-across; }
+@keyframes kb-zoom-in-left  { from { transform: scale(1.04) translate(2%, 1%); }  to { transform: scale(1.22) translate(-3%, -2%); } }
+@keyframes kb-zoom-in-right { from { transform: scale(1.04) translate(-2%, 1%); } to { transform: scale(1.22) translate(3%, -2%); } }
+@keyframes kb-zoom-out-up   { from { transform: scale(1.24) translate(0, 3%); }   to { transform: scale(1.06) translate(0, -1%); } }
+@keyframes kb-pan-across    { from { transform: scale(1.16) translate(-5%, 0); }  to { transform: scale(1.16) translate(5%, 0); } }
+@media (prefers-reduced-motion: reduce) { .kb img.is-loaded { animation: none; } }
+
 /* ---------- Detail ---------- */
 .detail { background: var(--surface); min-height: 100%; }
 .detail-hero { position: relative; height: 320px; }
