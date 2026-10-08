@@ -477,7 +477,7 @@ h1, h2, h3 { letter-spacing: -.01em; }
     position: absolute; top: 4px; left: calc(50% + 6px); font-style: normal; font-size: 10px; font-weight: 800; line-height: 16px;
     min-width: 16px; padding: 0 4px; border-radius: 999px; background: #e11d48; color: #fff;
   }
-  .leaflet-bottom { bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .map .leaflet-bottom { bottom: calc(80px + env(safe-area-inset-bottom)); }
   .leaflet-bottom.leaflet-right .leaflet-control-zoom { margin-bottom: 12px; }
   .map-preview { bottom: calc(100px + env(safe-area-inset-bottom)); }
 }
