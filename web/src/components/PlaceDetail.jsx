@@ -141,6 +141,17 @@ export default function PlaceDetail({ place, all, lang, review, onReview, onBack
           <textarea rows={3} placeholder={t('myNote', lang)} value={mine.note} onChange={(e) => onReview({ note: e.target.value })} />
         </section>
 
+        {place.video?.credit?.author && (
+          <p className="credit">
+            <Camera size={12} /> Video: {place.video.credit.author}
+            {place.video.credit.license && <> · {place.video.credit.license}</>}
+            {place.video.credit.page && (
+              <> · <a href={place.video.credit.page} target="_blank" rel="noopener noreferrer">
+                {place.video.credit.page.includes('wikimedia.org') ? 'Wikimedia Commons' : (lang === 'vi' ? 'Nguồn' : 'Source')} <ExternalLink size={11} />
+              </a>{lang === 'vi' ? ' (đã cắt ngắn)' : ' (trimmed)'}</>
+            )}
+          </p>
+        )}
         {(place.video?.model || '').startsWith('veo') && <p className="credit"><Camera size={12} /> {t('aiVideo', lang)} (Google Veo)</p>}
         {credit?.author && (
           <p className="credit">

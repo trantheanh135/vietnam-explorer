@@ -30,6 +30,7 @@ export default function PlaceEditor({ token, initial, category: initialCategory,
     ...(initial || {}),
     category: initialCategory,
     videoUrl: initial?.video?.url || '',
+    videoCredit: { page: '', author: '', license: '', ...(initial?.video?.credit || {}) },
     animatedUrl: initial?.animatedUrl || '',
   }))
   const [errors, setErrors] = useState({})
@@ -89,6 +90,9 @@ export default function PlaceEditor({ token, initial, category: initialCategory,
       price: food ? p.price : null,
       venue: food ? p.venue : null,
       image: p.image?.src ? p.image : null,
+      videoCredit: p.videoCredit?.author || p.videoCredit?.page || p.videoCredit?.license
+        ? { page: p.videoCredit.page || null, author: p.videoCredit.author || null, license: p.videoCredit.license || null }
+        : null,
     }
     delete body.createdAt
     delete body.updatedAt
@@ -226,6 +230,7 @@ export default function PlaceEditor({ token, initial, category: initialCategory,
               token={token}
               slug={initial?.id || p.nameEn}
               videoUrl={p.videoUrl}
+              videoCredit={p.videoCredit}
               animatedUrl={p.animatedUrl}
               onChange={set}
               errors={errors}

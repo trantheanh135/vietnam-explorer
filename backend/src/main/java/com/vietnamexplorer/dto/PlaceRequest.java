@@ -48,6 +48,8 @@ public record PlaceRequest(
 
         /** An uploaded video in our Blob store, or a YouTube link. Null/blank removes it. */
         @Size(max = 600) String videoUrl,
+        /** Credit for the video (author, licence, source page). Ignored when there is no video. */
+        @Valid CreditDto videoCredit,
         /** An uploaded GIF / animated WebP in our Blob store. Null/blank removes it. */
         @Size(max = 600) String animatedUrl,
         Boolean published

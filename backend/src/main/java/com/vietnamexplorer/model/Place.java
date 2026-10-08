@@ -103,6 +103,16 @@ public class Place {
 
     private Instant videoStartedAt;
 
+    /** Credit for a video made by someone else (e.g. a Wikimedia Commons clip). */
+    @Column(length = 600)
+    private String videoPage;
+
+    @Column(length = 200)
+    private String videoAuthor;
+
+    @Column(length = 80)
+    private String videoLicense;
+
     /** Animated image (GIF / animated WebP) in our Blob store, shown in the cover. */
     @Column(length = 600)
     private String animatedUrl;

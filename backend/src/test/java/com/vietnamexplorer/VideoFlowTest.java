@@ -274,6 +274,27 @@ class VideoFlowTest {
                 .andExpect(jsonPath("$.video.model").value("upload"));
         assertThat(BLOB_DELETES).anyMatch(d -> d.contains("lagoon-x1.gif"));
 
+        // A credit for someone else's video is stored, shown publicly, kept on saves without one, cleared with the video.
+        place.put("videoCredit", Map.of("page", "https://commons.wikimedia.org/wiki/File:Lagoon.webm", "author", "Le Monde en Vidéo", "license", "CC BY 3.0"));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/places/" + id))
+                .andExpect(jsonPath("$.video.credit.author").value("Le Monde en Vidéo"))
+                .andExpect(jsonPath("$.video.credit.license").value("CC BY 3.0"));
+        place.remove("videoCredit");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(jsonPath("$.video.credit.author").value("Le Monde en Vidéo"));
+        place.put("videoUrl", "");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(jsonPath("$.video").doesNotExist());
+        place.put("videoUrl", base + "video/lagoon-x2.mp4");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(jsonPath("$.video.credit").doesNotExist());
+
         // Files from elsewhere are refused (only our own store, or YouTube).
         place.put("videoUrl", "https://evil.example/clip.mp4");
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)

@@ -7,7 +7,7 @@ import { uploadMedia, youtubeId } from '../lib/api'
  * Files upload straight to Vercel Blob; the URLs are saved with the place on "Lưu".
  * Without either, the cover photo still animates by itself (slow zoom/pan).
  */
-export default function MediaSection({ token, slug, videoUrl, animatedUrl, onChange, errors }) {
+export default function MediaSection({ token, slug, videoUrl, videoCredit, animatedUrl, onChange, errors }) {
   const [progress, setProgress] = useState({}) // { video: 42, animated: 10 }
   const [error, setError] = useState('')
   const [ytInput, setYtInput] = useState('')
@@ -90,6 +90,15 @@ export default function MediaSection({ token, slug, videoUrl, animatedUrl, onCha
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), useYoutube())} />
             <button type="button" className="btn small" disabled={!ytInput.trim()} onClick={useYoutube}><Link2 size={15} /> Dùng</button>
           </div>
+          {videoUrl && (
+            <div className="credit-fields">
+              <span className="admin-muted small">Nguồn video (bắt buộc nếu là video của người khác, ví dụ Wikimedia CC BY):</span>
+              <input value={videoCredit?.author || ''} placeholder="Tác giả" onChange={(e) => onChange({ videoCredit: { ...videoCredit, author: e.target.value } })} />
+              <input value={videoCredit?.license || ''} placeholder="Giấy phép, vd. CC BY 3.0" onChange={(e) => onChange({ videoCredit: { ...videoCredit, license: e.target.value } })} />
+              <input value={videoCredit?.page || ''} placeholder="Link nguồn (https://…)" onChange={(e) => onChange({ videoCredit: { ...videoCredit, page: e.target.value } })} />
+              {errors?.['videoCredit.page'] && <p className="form-error small">{errors['videoCredit.page']}</p>}
+            </div>
+          )}
           <p className="admin-muted small">MP4/WebM tối đa 50 MB — nên dùng clip ngắn (10–30 giây). Bộ nhớ miễn phí tổng cộng 1 GB.</p>
           {errors?.videoUrl && <p className="form-error small">{errors.videoUrl}</p>}
         </div>

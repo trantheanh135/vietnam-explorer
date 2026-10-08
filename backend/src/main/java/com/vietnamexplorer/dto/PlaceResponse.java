@@ -32,13 +32,18 @@ public record PlaceResponse(
         Instant updatedAt
 ) {
     /** url is set once a video exists; status/error describe the latest generation (admin only). */
-    public record VideoDto(String url, String status, String error, String model, Instant startedAt) {
+    public record VideoDto(String url, String status, String error, String model, Instant startedAt, CreditDto credit) {
+    }
+
+    private static CreditDto videoCredit(Place p) {
+        return p.getVideoAuthor() == null && p.getVideoPage() == null && p.getVideoLicense() == null
+                ? null : new CreditDto(p.getVideoPage(), p.getVideoAuthor(), p.getVideoLicense());
     }
 
     /** Public view: only a finished video, no generation details. */
     public static PlaceResponse publicView(Place p) {
         PlaceResponse r = from(p);
-        VideoDto v = p.getVideoUrl() == null ? null : new VideoDto(p.getVideoUrl(), "ready", null, p.getVideoModel(), null);
+        VideoDto v = p.getVideoUrl() == null ? null : new VideoDto(p.getVideoUrl(), "ready", null, p.getVideoModel(), null, videoCredit(p));
         return new PlaceResponse(r.id, r.category, r.region, r.nameEn, r.nameVi, r.venue, r.address, r.area, r.lat, r.lng,
                 r.tags, r.descEn, r.descVi, r.tipEn, r.tipVi, r.rating, r.price, r.image, v, r.animatedUrl, r.published, r.createdAt, r.updatedAt);
     }
@@ -52,7 +57,7 @@ public record PlaceResponse(
                 : new ImageDto(p.getImageSrc(), p.getImagePage(), p.getImageAuthor(), p.getImageLicense());
         VideoDto video = p.getVideoUrl() == null && p.getVideoStatus() == null
                 ? null
-                : new VideoDto(p.getVideoUrl(), p.getVideoStatus(), p.getVideoError(), p.getVideoModel(), p.getVideoStartedAt());
+                : new VideoDto(p.getVideoUrl(), p.getVideoStatus(), p.getVideoError(), p.getVideoModel(), p.getVideoStartedAt(), videoCredit(p));
         return new PlaceResponse(p.getId(), p.getCategory(), p.getRegion(), p.getNameEn(), p.getNameVi(),
                 p.getVenue(), p.getAddress(), p.getArea(), p.getLat(), p.getLng(), tags,
                 p.getDescEn(), p.getDescVi(), p.getTipEn(), p.getTipVi(), p.getRating(), p.getPrice(),

@@ -139,3 +139,5 @@
 .video-progress .bar { width: 70%; height: 6px; border-radius: 999px; background: rgba(255,255,255,.25); overflow: hidden; }
 .video-progress .bar span { display: block; height: 100%; background: #fff; transition: width .2s; }
 @media (max-width: 760px) { .media-grid { grid-template-columns: 1fr; } }
+.credit-fields { display: grid; gap: 6px; margin-top: 10px; }
+.credit-fields input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-size: 13px; color: var(--ink); }

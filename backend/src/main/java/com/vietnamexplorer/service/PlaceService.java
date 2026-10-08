@@ -141,6 +141,7 @@ public class PlaceService {
      * Animated image: a GIF / animated WebP uploaded to our Blob store. Blank removes it.
      */
     private void applyMedia(Place p, PlaceRequest r) {
+        String videoBefore = p.getVideoUrl();
         String video = trimToNull(r.videoUrl());
         if (video == null) {
             if (!"generating".equals(p.getVideoStatus())) {
@@ -164,12 +165,28 @@ public class PlaceService {
             p.setVideoError(null);
         }
 
+        // Credit: replaced when one is sent; kept while the same video stays; cleared with the video.
+        boolean videoChanged = !java.util.Objects.equals(videoBefore, p.getVideoUrl());
+        if (p.getVideoUrl() == null) {
+            setVideoCredit(p, null);
+        } else if (r.videoCredit() != null) {
+            setVideoCredit(p, r.videoCredit());
+        } else if (videoChanged) {
+            setVideoCredit(p, null);
+        }
+
         String animated = trimToNull(r.animatedUrl());
         if (animated != null && !animated.equals(p.getAnimatedUrl())
                 && !(blob.isOurs(animated) && animated.matches("(?i).+\\.(gif|webp)$"))) {
             throw ApiException.badRequest("Ảnh động phải là tệp GIF/WebP đã tải lên");
         }
         p.setAnimatedUrl(animated);
+    }
+
+    private static void setVideoCredit(Place p, com.vietnamexplorer.dto.CreditDto c) {
+        p.setVideoPage(c == null ? null : trimToNull(c.page()));
+        p.setVideoAuthor(c == null ? null : trimToNull(c.author()));
+        p.setVideoLicense(c == null ? null : trimToNull(c.license()));
     }
 
     private void deleteUploadIfUnused(String src) {
