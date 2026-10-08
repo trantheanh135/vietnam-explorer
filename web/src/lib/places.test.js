@@ -90,3 +90,16 @@ describe('setReview', () => {
     expect(after['hoi-an'].favourite).toBe(false)
   })
 })
+
+describe('journeyOrder', () => {
+  it('goes north → central → south and hops to the nearest next place', async () => {
+    const { journeyOrder } = await import('../components/Journey.jsx')
+    const travel = SEED.filter((p) => p.category === 'travel')
+    const order = journeyOrder(travel)
+    expect(order).toHaveLength(travel.length)
+    const rank = { north: 0, central: 1, south: 2 }
+    expect(order.every((p, i) => i === 0 || rank[order[i - 1].region] <= rank[p.region])).toBe(true)
+    const firstNorth = order[0]
+    expect(travel.filter((p) => p.region === 'north').every((p) => p.lat <= firstNorth.lat)).toBe(true)
+  })
+})

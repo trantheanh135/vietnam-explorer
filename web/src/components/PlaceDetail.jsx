@@ -1,9 +1,10 @@
-import { ArrowLeft, CalendarDays, Camera, Check, ExternalLink, Footprints, Heart, Lightbulb, MapPin, Navigation, Share2, Star, Wallet } from 'lucide-react'
+import { X, CalendarDays, Camera, Check, ExternalLink, Footprints, Heart, Lightbulb, MapPin, Navigation, Share2, Star, Wallet } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { t } from '../i18n'
 import { desc, directionsUrl, formatDistance, googleMapsUrl, nearby, otherTitle, REGIONS, tip, title, TRAVEL_TAGS } from '../lib/places'
 import HeroMedia from './HeroMedia'
 import PlaceImage from './PlaceImage'
+import SMap from './SMap'
 import Stars from './Stars'
 
 export default function PlaceDetail({ place, all, lang, review, onReview, onBack, onOpen }) {
@@ -31,8 +32,8 @@ export default function PlaceDetail({ place, all, lang, review, onReview, onBack
       <div className="detail-hero">
         <HeroMedia place={place} lang={lang} />
         <div className="hero-btns">
-          <button type="button" className="round-btn" onClick={onBack} aria-label={t('back', lang)}>
-            <ArrowLeft size={20} />
+          <button type="button" className="round-btn" onClick={onBack} aria-label={t('close', lang)}>
+            <X size={20} />
           </button>
           <span className="spacer" />
           <button type="button" className="round-btn" onClick={share} aria-label={t('share', lang)}>
@@ -118,6 +119,15 @@ export default function PlaceDetail({ place, all, lang, review, onReview, onBack
             </div>
           </section>
         )}
+
+        <section className="on-map">
+          <SMap places={[place]} activeId={place.id} lang={lang} showRoute={false} className="mini" />
+          <div>
+            <h3>{t('onTheMap', lang)}</h3>
+            <p>{food ? <>{place.venue}<br />{place.address || place.area}</> : <>{place.area} · {REGIONS[place.region][lang]}</>}</p>
+            <p className="coords">{place.lat.toFixed(4)}° N, {place.lng.toFixed(4)}° E</p>
+          </div>
+        </section>
 
         <section className="my-review">
           <h3>{t('myReview', lang)}</h3>

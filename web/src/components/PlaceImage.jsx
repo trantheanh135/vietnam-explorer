@@ -49,6 +49,8 @@ export default function PlaceImage({ place, className = '', eager = false, anima
       {(!loaded || failed) && (
         <div className="pimg-placeholder" aria-hidden="true">
           <Icon size={34} strokeWidth={1.5} />
+          <span className="ph-name">{place.nameVi}</span>
+          <span className="ph-sub">{place.category === 'food' ? place.venue : place.area}</span>
         </div>
       )}
       {url && !failed && (
