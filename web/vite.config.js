@@ -63,6 +63,17 @@ export default defineConfig({
             },
           },
           {
+            // Animated images (GIF/WebP) and YouTube thumbnails; videos are streamed, not cached.
+            urlPattern: ({ url, request }) => request.destination === 'image'
+              && (url.hostname.endsWith('.blob.vercel-storage.com') || url.hostname === 'i.ytimg.com'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'media-images',
+              expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
             urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
             handler: 'CacheFirst',
             options: {

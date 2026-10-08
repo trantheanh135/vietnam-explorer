@@ -21,6 +21,10 @@ public class PlaceService {
     private final PlaceRepository repository;
     private final UploadService uploads;
     private final VideoService videos;
+    private final BlobStorage blob;
+
+    private static final java.util.regex.Pattern YOUTUBE = java.util.regex.Pattern.compile(
+            "^https://(?:www\\.|m\\.)?(?:youtube\\.com/(?:watch\\?(?:.*&)?v=|shorts/|embed/)|youtu\\.be/)([A-Za-z0-9_-]{11})(?:[?&#].*)?$");
 
     @Transactional(readOnly = true)
     public List<PlaceResponse> list(String category, boolean includeUnpublished) {
@@ -54,6 +58,7 @@ public class PlaceService {
         p.setId(id);
         p.setSortOrder(repository.maxSortOrder() + 1);
         apply(p, req);
+        applyMedia(p, req);
         return PlaceResponse.from(repository.save(p));
     }
 
@@ -62,9 +67,14 @@ public class PlaceService {
         checkCategoryRules(req);
         Place p = repository.findById(id).orElseThrow(() -> ApiException.notFound("Không tìm thấy địa điểm"));
         String oldImage = p.getImageSrc();
+        String oldVideo = p.getVideoUrl();
+        String oldAnimated = p.getAnimatedUrl();
         apply(p, req);
+        applyMedia(p, req);
         repository.saveAndFlush(p);
         if (oldImage != null && !oldImage.equals(p.getImageSrc())) deleteUploadIfUnused(oldImage);
+        if (oldVideo != null && !oldVideo.equals(p.getVideoUrl()) && blob.isOurs(oldVideo)) blob.delete(oldVideo);
+        if (oldAnimated != null && !oldAnimated.equals(p.getAnimatedUrl()) && blob.isOurs(oldAnimated)) blob.delete(oldAnimated);
         return PlaceResponse.from(p);
     }
 
@@ -124,6 +134,42 @@ public class PlaceService {
         p.setImageAuthor(hasImage ? trimToNull(img.author()) : null);
         p.setImageLicense(hasImage ? trimToNull(img.license()) : null);
         p.setPublished(r.published() == null || r.published());
+    }
+
+    /**
+     * Video: an MP4/WebM uploaded to our Blob store, or a YouTube link (stored as watch?v=ID).
+     * Animated image: a GIF / animated WebP uploaded to our Blob store. Blank removes it.
+     */
+    private void applyMedia(Place p, PlaceRequest r) {
+        String video = trimToNull(r.videoUrl());
+        if (video == null) {
+            if (!"generating".equals(p.getVideoStatus())) {
+                p.setVideoUrl(null);
+                p.setVideoStatus(null);
+                p.setVideoModel(null);
+                p.setVideoError(null);
+            }
+        } else if (!video.equals(p.getVideoUrl())) {
+            var yt = YOUTUBE.matcher(video);
+            if (yt.matches()) {
+                p.setVideoUrl("https://www.youtube.com/watch?v=" + yt.group(1));
+                p.setVideoModel("youtube");
+            } else if (blob.isOurs(video) && video.matches("(?i).+\\.(mp4|webm)$")) {
+                p.setVideoUrl(video);
+                p.setVideoModel("upload");
+            } else {
+                throw ApiException.badRequest("Video phải là tệp MP4/WebM đã tải lên hoặc link YouTube");
+            }
+            p.setVideoStatus("ready");
+            p.setVideoError(null);
+        }
+
+        String animated = trimToNull(r.animatedUrl());
+        if (animated != null && !animated.equals(p.getAnimatedUrl())
+                && !(blob.isOurs(animated) && animated.matches("(?i).+\\.(gif|webp)$"))) {
+            throw ApiException.badRequest("Ảnh động phải là tệp GIF/WebP đã tải lên");
+        }
+        p.setAnimatedUrl(animated);
     }
 
     private void deleteUploadIfUnused(String src) {

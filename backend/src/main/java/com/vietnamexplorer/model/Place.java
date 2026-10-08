@@ -103,6 +103,10 @@ public class Place {
 
     private Instant videoStartedAt;
 
+    /** Animated image (GIF / animated WebP) in our Blob store, shown in the cover. */
+    @Column(length = 600)
+    private String animatedUrl;
+
     private boolean published = true;
 
     private int sortOrder;

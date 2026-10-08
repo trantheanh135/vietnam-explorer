@@ -45,6 +45,11 @@ public record PlaceRequest(
         @Size(max = 60) String price,
 
         @Valid ImageDto image,
+
+        /** An uploaded video in our Blob store, or a YouTube link. Null/blank removes it. */
+        @Size(max = 600) String videoUrl,
+        /** An uploaded GIF / animated WebP in our Blob store. Null/blank removes it. */
+        @Size(max = 600) String animatedUrl,
         Boolean published
 ) {
 }

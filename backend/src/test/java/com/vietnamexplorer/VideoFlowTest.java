@@ -245,6 +245,54 @@ class VideoFlowTest {
     }
 
     @Test
+    void adminCanAttachUploadedVideosYoutubeLinksAndGifs() throws Exception {
+        String auth = login();
+        String id = placeWithUploadedPhoto(auth);
+        String base = "https://teststore.public.blob.vercel-storage.com/media/";
+        Map<String, Object> place = new java.util.HashMap<>(json.convertValue(
+                json.readTree(body(mvc.perform(get("/api/admin/places/" + id).header("Authorization", auth)))), Map.class));
+        place.keySet().removeAll(List.of("video", "createdAt", "updatedAt"));
+
+        // YouTube short link → normalised watch URL
+        place.put("videoUrl", "https://youtu.be/dQw4w9WgXcQ?si=abc");
+        place.put("animatedUrl", base + "animated/lagoon-x1.gif");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.video.url").value("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+                .andExpect(jsonPath("$.video.model").value("youtube"))
+                .andExpect(jsonPath("$.animatedUrl").value(base + "animated/lagoon-x1.gif"));
+        mvc.perform(get("/api/places/" + id))
+                .andExpect(jsonPath("$.video.url").value("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+                .andExpect(jsonPath("$.animatedUrl").value(base + "animated/lagoon-x1.gif"));
+
+        // Replace with an uploaded MP4 and a new GIF: the old GIF is deleted from Blob.
+        place.put("videoUrl", base + "video/lagoon-x2.mp4");
+        place.put("animatedUrl", base + "animated/lagoon-x3.gif");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(jsonPath("$.video.model").value("upload"));
+        assertThat(BLOB_DELETES).anyMatch(d -> d.contains("lagoon-x1.gif"));
+
+        // Files from elsewhere are refused (only our own store, or YouTube).
+        place.put("videoUrl", "https://evil.example/clip.mp4");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Video phải là tệp MP4/WebM đã tải lên hoặc link YouTube"));
+        place.put("videoUrl", base + "video/lagoon-x2.mp4");
+        place.put("animatedUrl", "https://evil.example/a.gif");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/admin/places/" + id)
+                        .header("Authorization", auth).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(place)))
+                .andExpect(status().isBadRequest());
+
+        // Deleting the place removes its video and GIF from Blob.
+        mvc.perform(delete("/api/admin/places/" + id).header("Authorization", auth)).andExpect(status().isNoContent());
+        assertThat(BLOB_DELETES).anyMatch(d -> d.contains("lagoon-x2.mp4"));
+        assertThat(BLOB_DELETES).anyMatch(d -> d.contains("lagoon-x3.gif"));
+    }
+
+    @Test
     void reportsFailuresAndEnforcesTheDailyLimit() throws Exception {
         String auth = login();
         String id = placeWithUploadedPhoto(auth);

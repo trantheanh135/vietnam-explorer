@@ -26,6 +26,7 @@ public record PlaceResponse(
         String price,
         ImageDto image,
         VideoDto video,
+        String animatedUrl,
         boolean published,
         Instant createdAt,
         Instant updatedAt
@@ -39,7 +40,7 @@ public record PlaceResponse(
         PlaceResponse r = from(p);
         VideoDto v = p.getVideoUrl() == null ? null : new VideoDto(p.getVideoUrl(), "ready", null, p.getVideoModel(), null);
         return new PlaceResponse(r.id, r.category, r.region, r.nameEn, r.nameVi, r.venue, r.address, r.area, r.lat, r.lng,
-                r.tags, r.descEn, r.descVi, r.tipEn, r.tipVi, r.rating, r.price, r.image, v, r.published, r.createdAt, r.updatedAt);
+                r.tags, r.descEn, r.descVi, r.tipEn, r.tipVi, r.rating, r.price, r.image, v, r.animatedUrl, r.published, r.createdAt, r.updatedAt);
     }
 
     public static PlaceResponse from(Place p) {
@@ -55,6 +56,6 @@ public record PlaceResponse(
         return new PlaceResponse(p.getId(), p.getCategory(), p.getRegion(), p.getNameEn(), p.getNameVi(),
                 p.getVenue(), p.getAddress(), p.getArea(), p.getLat(), p.getLng(), tags,
                 p.getDescEn(), p.getDescVi(), p.getTipEn(), p.getTipVi(), p.getRating(), p.getPrice(),
-                image, video, p.isPublished(), p.getCreatedAt(), p.getUpdatedAt());
+                image, video, p.getAnimatedUrl(), p.isPublished(), p.getCreatedAt(), p.getUpdatedAt());
     }
 }

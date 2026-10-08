@@ -126,3 +126,16 @@
 @media (max-width: 760px) {
   .video-row { grid-template-columns: 1fr; }
 }
+
+/* ---------- Media (animated image + video) ---------- */
+.media-box { display: grid; gap: 12px; }
+.media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.media-card { display: grid; gap: 10px; align-content: start; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+.media-card h4 { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.media-card h4 svg { color: var(--accent); }
+.media-card .video-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.media-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.yt-chip { position: absolute; top: 8px; left: 8px; background: #e00; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+.video-progress .bar { width: 70%; height: 6px; border-radius: 999px; background: rgba(255,255,255,.25); overflow: hidden; }
+.video-progress .bar span { display: block; height: 100%; background: #fff; transition: width .2s; }
+@media (max-width: 760px) { .media-grid { grid-template-columns: 1fr; } }

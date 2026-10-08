@@ -8,7 +8,7 @@ const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.
  * The place's AI video, layered over its photo: fades in once it actually plays, muted + looping
  * (browsers only autoplay muted video). Respects "reduce motion": then it waits for a tap.
  */
-export default function PlaceVideo({ url, lang }) {
+export default function PlaceVideo({ url, lang, ai = false }) {
   const ref = useRef(null)
   const [playing, setPlaying] = useState(false)
   const [muted, setMuted] = useState(true)
@@ -43,7 +43,7 @@ export default function PlaceVideo({ url, lang }) {
         onPlaying={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
       />
-      <span className="ai-badge" title={t('aiVideo', lang)}><Sparkles size={12} /> AI</span>
+      {ai && <span className="ai-badge" title={t('aiVideo', lang)}><Sparkles size={12} /> AI</span>}
       {playing ? (
         <button type="button" className="round-btn sound" onClick={toggleSound} aria-label={t('sound', lang)} aria-pressed={!muted}>
           {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}

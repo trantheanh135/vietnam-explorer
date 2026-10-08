@@ -1,8 +1,7 @@
 import { ArrowLeft, CalendarDays, Camera, Check, ExternalLink, Heart, Lightbulb, MapPin, Navigation, Wallet } from 'lucide-react'
 import { t } from '../i18n'
 import { desc, directionsUrl, googleMapsUrl, otherTitle, REGIONS, tip, title, TRAVEL_TAGS } from '../lib/places'
-import PlaceImage from './PlaceImage'
-import PlaceVideo from './PlaceVideo'
+import HeroMedia from './HeroMedia'
 import Stars from './Stars'
 
 export default function PlaceDetail({ place, lang, review, onReview, onBack }) {
@@ -13,8 +12,7 @@ export default function PlaceDetail({ place, lang, review, onReview, onBack }) {
   return (
     <article className={`detail ${place.category}`}>
       <div className="detail-hero">
-        <PlaceImage place={place} eager animated />
-        {place.video?.url && <PlaceVideo url={place.video.url} lang={lang} />}
+        <HeroMedia place={place} lang={lang} />
         <button type="button" className="round-btn back" onClick={onBack} aria-label={t('back', lang)}>
           <ArrowLeft size={20} />
         </button>
@@ -75,7 +73,7 @@ export default function PlaceDetail({ place, lang, review, onReview, onBack }) {
           <textarea rows={3} placeholder={t('myNote', lang)} value={mine.note} onChange={(e) => onReview({ note: e.target.value })} />
         </section>
 
-        {place.video?.url && <p className="credit"><Camera size={12} /> {t('aiVideo', lang)} (Google Veo)</p>}
+        {(place.video?.model || '').startsWith('veo') && <p className="credit"><Camera size={12} /> {t('aiVideo', lang)} (Google Veo)</p>}
         {credit?.author && (
           <p className="credit">
             <Camera size={12} /> {t('photo', lang)}: {credit.author}

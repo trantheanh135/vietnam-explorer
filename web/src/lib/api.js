@@ -1,6 +1,7 @@
 // Talks to the Vietnam Explorer API on the k8s server (through ngrok).
 // VITE_API_URL e.g. https://<ngrok-domain>/vietnam-explorer/api  (dev: http://localhost:8085/api)
 import SEED from '../data/seed.json'
+import { upload as blobUpload } from '@vercel/blob/client'
 
 export const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
@@ -88,6 +89,32 @@ export function loadApiImage(src) {
       }))
   }
   return blobCache.get(src)
+}
+
+// ---------- media (videos, animated images) ----------
+
+/** "https://youtu.be/ID", "…watch?v=ID", "…/shorts/ID" → "ID" (or null). */
+export function youtubeId(url) {
+  const m = /^https:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/.exec(url || '')
+  return m ? m[1] : null
+}
+
+/**
+ * Uploads a video or animated image straight from the browser to Vercel Blob. The Vercel function
+ * /api/media-upload checks the admin token and the file type/size before Blob accepts it.
+ */
+export async function uploadMedia(token, kind, file, slug, onProgress) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase()
+  const safe = (slug || 'place').toLowerCase().replace(/[^a-z0-9-]+/g, '-').slice(0, 60) || 'place'
+  const res = await blobUpload(`media/${kind}/${safe}.${ext}`, file, {
+    access: 'public',
+    handleUploadUrl: '/api/media-upload',
+    clientPayload: JSON.stringify({ token }),
+    multipart: file.size > 8 * 1024 * 1024,
+    contentType: file.type,
+    onUploadProgress: ({ percentage }) => onProgress?.(percentage),
+  })
+  return res.url
 }
 
 // ---------- admin ----------

@@ -17,11 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -52,6 +50,7 @@ public class VideoService {
     private final PlaceRepository places;
     private final VideoJobRepository jobs;
     private final UploadService uploads;
+    private final BlobStorage blob;
     private final ObjectMapper json;
     private final HttpClient http = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -59,11 +58,12 @@ public class VideoService {
             .build();
 
     public VideoService(AppProperties props, PlaceRepository places, VideoJobRepository jobs,
-                        UploadService uploads, ObjectMapper json) {
+                        UploadService uploads, BlobStorage blob, ObjectMapper json) {
         this.cfg = props.video();
         this.places = places;
         this.jobs = jobs;
         this.uploads = uploads;
+        this.blob = blob;
         this.json = json;
     }
 
@@ -176,7 +176,7 @@ public class VideoService {
         }
 
         byte[] mp4 = download(uri);
-        String url = uploadToBlob("videos/" + placeId + ".mp4", mp4);
+        String url = blob.upload("videos/" + placeId + ".mp4", mp4, "video/mp4");
         String old = p.getVideoUrl();
 
         p.setVideoUrl(url);
@@ -190,7 +190,7 @@ public class VideoService {
             job.setFinishedAt(Instant.now());
             jobs.save(job);
         }
-        if (old != null && !old.equals(url)) deleteFromBlob(old);
+        if (old != null && !old.equals(url) && blob.isOurs(old)) blob.delete(old);
         log.info("Video ready for {} ({} KB)", placeId, mp4.length / 1024);
     }
 
@@ -199,14 +199,15 @@ public class VideoService {
     @Transactional
     public Place remove(String placeId) {
         Place p = places.findById(placeId).orElseThrow(() -> ApiException.notFound("Không tìm thấy địa điểm"));
-        if (p.getVideoUrl() != null) deleteFromBlob(p.getVideoUrl());
+        if (blob.isOurs(p.getVideoUrl())) blob.delete(p.getVideoUrl());
         clear(p);
         return places.save(p);
     }
 
-    /** Called when a place is deleted. */
+    /** Called when a place is deleted: removes its video and animated image from our Blob store. */
     public void deleteVideoOf(Place p) {
-        if (p.getVideoUrl() != null) deleteFromBlob(p.getVideoUrl());
+        if (blob.isOurs(p.getVideoUrl())) blob.delete(p.getVideoUrl());
+        if (blob.isOurs(p.getAnimatedUrl())) blob.delete(p.getAnimatedUrl());
     }
 
     // ---------------------------------------------------------------- helpers
@@ -285,45 +286,6 @@ public class VideoService {
                 .header("x-goog-api-key", cfg.geminiApiKey()).timeout(Duration.ofMinutes(2)).GET().build());
         if (r.statusCode() != 200) throw new ApiException(HttpStatus.BAD_GATEWAY, "Không tải được video từ Google (" + r.statusCode() + ")");
         return r.body();
-    }
-
-    /** Vercel Blob REST API (same calls as the official @vercel/blob SDK, API version 12). */
-    private String uploadToBlob(String pathname, byte[] bytes) {
-        HttpResponse<byte[]> r = send(blobRequest("/?pathname=" + URLEncoder.encode(pathname, StandardCharsets.UTF_8))
-                .header("x-vercel-blob-access", "public")
-                .header("x-content-type", "video/mp4")
-                .header("x-add-random-suffix", "1")
-                .header("x-cache-control-max-age", "31536000")
-                .PUT(HttpRequest.BodyPublishers.ofByteArray(bytes)).build());
-        try {
-            JsonNode node = json.readTree(r.body());
-            if (r.statusCode() >= 300 || !node.hasNonNull("url"))
-                throw new ApiException(HttpStatus.BAD_GATEWAY, "Không lưu được video lên Vercel Blob (" + r.statusCode() + ")");
-            return node.get("url").asText();
-        } catch (IOException e) {
-            throw new ApiException(HttpStatus.BAD_GATEWAY, "Phản hồi lạ từ Vercel Blob");
-        }
-    }
-
-    private void deleteFromBlob(String url) {
-        try {
-            byte[] body = json.writeValueAsBytes(Map.of("urls", List.of(url)));
-            HttpResponse<byte[]> r = send(blobRequest("/delete").header("content-type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(body)).build());
-            if (r.statusCode() >= 300) log.warn("Blob delete of {} returned {}", url, r.statusCode());
-        } catch (Exception e) {
-            log.warn("Blob delete of {} failed", url, e);
-        }
-    }
-
-    private HttpRequest.Builder blobRequest(String path) {
-        String[] parts = cfg.blobToken().split("_");
-        String storeId = parts.length > 3 ? parts[3] : "";
-        return HttpRequest.newBuilder(URI.create(cfg.blobApiUrl() + path))
-                .header("authorization", "Bearer " + cfg.blobToken())
-                .header("x-api-version", "12")
-                .header("x-vercel-blob-store-id", storeId)
-                .timeout(Duration.ofMinutes(2));
     }
 
     private HttpResponse<byte[]> send(HttpRequest req) {

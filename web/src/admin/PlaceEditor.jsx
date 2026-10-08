@@ -5,11 +5,12 @@ import { admin } from '../lib/api'
 import { resizeImage } from '../lib/image'
 import { REGIONS, TRAVEL_TAGS } from '../lib/places'
 import LocationPicker from './LocationPicker'
-import VideoSection from './VideoSection'
+import MediaSection from './MediaSection'
 
 const EMPTY = {
   region: 'north', nameEn: '', nameVi: '', venue: '', address: '', area: '', lat: null, lng: null,
   tags: [], descEn: '', descVi: '', tipEn: '', tipVi: '', rating: 4, price: '', image: null, published: true,
+  videoUrl: '', animatedUrl: '',
 }
 
 function Field({ label, error, hint, children, wide }) {
@@ -22,10 +23,15 @@ function Field({ label, error, hint, children, wide }) {
   )
 }
 
-export default function PlaceEditor({ token, initial, category: initialCategory, onCancel, onSaved, onAuthError, onVideoChange }) {
+export default function PlaceEditor({ token, initial, category: initialCategory, onCancel, onSaved, onAuthError }) {
   const isNew = !initial
-  const [saved, setSaved] = useState(initial) // latest server copy (video status changes while open)
-  const [p, setP] = useState(() => ({ ...EMPTY, ...(initial || {}), category: initialCategory }))
+  const [p, setP] = useState(() => ({
+    ...EMPTY,
+    ...(initial || {}),
+    category: initialCategory,
+    videoUrl: initial?.video?.url || '',
+    animatedUrl: initial?.animatedUrl || '',
+  }))
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -215,17 +221,14 @@ export default function PlaceEditor({ token, initial, category: initialCategory,
           </fieldset>
 
           <fieldset>
-            <legend>Video AI</legend>
-            <VideoSection
+            <legend>Ảnh động & video</legend>
+            <MediaSection
               token={token}
-              place={saved}
-              hasPhoto={!!saved?.image?.src}
-              photoChanged={!!saved && (saved.image?.src || null) !== (p.image?.src || null)}
-              onChange={(next) => {
-                setSaved(next)
-                onVideoChange?.(next)
-              }}
-              onAuthError={onAuthError}
+              slug={initial?.id || p.nameEn}
+              videoUrl={p.videoUrl}
+              animatedUrl={p.animatedUrl}
+              onChange={set}
+              errors={errors}
             />
           </fieldset>
         </div>

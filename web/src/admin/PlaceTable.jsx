@@ -1,4 +1,4 @@
-import { Clapperboard, EyeOff, Loader2, Pencil, Search, Star, Trash2 } from 'lucide-react'
+import { Clapperboard, EyeOff, ImagePlay, Pencil, Search, Star, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import PlaceImage from '../components/PlaceImage'
 import { filterPlaces, REGIONS } from '../lib/places'
@@ -42,7 +42,7 @@ export default function PlaceTable({ places, onEdit, onDelete }) {
               <strong>
                 {p.nameVi}
                 {p.video?.url && <Clapperboard size={14} className="has-video" aria-label="có video" />}
-                {p.video?.status === 'generating' && <Loader2 size={14} className="spin has-video" aria-label="đang tạo video" />}
+                {p.animatedUrl && <ImagePlay size={14} className="has-video" aria-label="có ảnh động" />}
               </strong>
               <span>{p.category === 'food' ? `${p.venue} · ${p.area}` : `${p.nameEn} · ${p.area}`}</span>
             </div>

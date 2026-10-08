@@ -109,7 +109,6 @@ export default function AdminApp() {
           onCancel={() => setEditing(null)}
           onSaved={onSaved}
           onAuthError={handleError}
-          onVideoChange={(next) => setPlaces((list) => list?.map((x) => (x.id === next.id ? next : x)))}
         />
       )}
 
