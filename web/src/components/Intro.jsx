@@ -2,7 +2,7 @@ import { ArrowDown, Map as MapIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { t } from '../i18n'
 import { REGIONS, title } from '../lib/places'
-import PlaceImage from './PlaceImage'
+import PlaceMedia from './PlaceMedia'
 
 /** Full-screen opening: slow cross-fading photos, the title, and the way into the journey. */
 export default function Intro({ category, lang, slides, counts, onStart, onMap }) {
@@ -22,7 +22,7 @@ export default function Intro({ category, lang, slides, counts, onStart, onMap }
       <div className="intro-media" aria-hidden="true">
         {slides.map((p, i) => (
           <div key={p.id} className={`intro-slide ${i === index ? 'on' : ''}`}>
-            <PlaceImage place={p} eager={i < 2} animated />
+            <PlaceMedia place={p} eager={i < 2} animated active={i === index} restart />
           </div>
         ))}
       </div>

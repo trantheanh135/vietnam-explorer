@@ -555,3 +555,14 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .hover-card-others em { font-style: normal; font-weight: 400; color: var(--muted); }
 .map-hover { position: absolute; z-index: 1100; animation: card-pop .18s ease-out both; }
 .map-hover .hover-card-media { height: 130px; }
+
+/* Silent looping clips over photos (stories, chapter banners, intro, hover cards) */
+.loop-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .7s ease; z-index: 1; pointer-events: none; }
+.loop-video.on { opacity: 1; }
+.story-badge, .hover-card-region, .hover-card-rating { z-index: 3; }
+.chapter-head::after { z-index: 1; }
+.chapter-text { z-index: 2; }
+.intro-media::after { z-index: 2; }
+.intro-media { z-index: 0; isolation: isolate; }
+.intro-content, .intro-caption { z-index: 3; }
+.story-media, .hover-card-media, .chapter-head { isolation: isolate; }

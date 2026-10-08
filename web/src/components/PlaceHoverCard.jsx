@@ -1,7 +1,7 @@
 import { ArrowUpRight, MapPin, Star, Wallet } from 'lucide-react'
 import { t } from '../i18n'
 import { desc, REGIONS, title } from '../lib/places'
-import PlaceImage from './PlaceImage'
+import PlaceMedia from './PlaceMedia'
 
 /** A compact preview of a place, shown when hovering it on a map. `others`: places at the same spot. */
 export default function PlaceHoverCard({ place, lang, others = [], onOpen }) {
@@ -9,7 +9,7 @@ export default function PlaceHoverCard({ place, lang, others = [], onOpen }) {
   return (
     <div className={`hover-card ${place.category}`}>
       <div className="hover-card-media">
-        <PlaceImage place={place} eager />
+        <PlaceMedia place={place} eager />
         <span className="hover-card-region">{REGIONS[place.region][lang]}</span>
         {food && <span className="hover-card-rating"><Star size={12} fill="currentColor" strokeWidth={0} /> {place.rating.toFixed(1)}</span>}
       </div>

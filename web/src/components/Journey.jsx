@@ -2,7 +2,7 @@ import { ArrowUpRight, Check, Heart, ImagePlay, MapPin, Play, Star, Wallet } fro
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../i18n'
 import { desc, distanceKm, REGIONS, title, TRAVEL_TAGS } from '../lib/places'
-import PlaceImage from './PlaceImage'
+import PlaceMedia, { playableVideo } from './PlaceMedia'
 import SMap from './SMap'
 
 const ORDER = ['north', 'central', 'south']
@@ -50,7 +50,7 @@ function Story({ place, index, lang, mine, onOpen, onFavourite }) {
   return (
     <article className={`story ${index % 2 ? 'flip' : ''}`} data-story={place.id}>
       <button type="button" className="story-media" onClick={() => onOpen(place.id)} aria-label={title(place, lang)}>
-        <PlaceImage place={place} />
+        <PlaceMedia place={place} />
         {(place.video?.url || place.animatedUrl) && (
           <span className="story-badge">
             {place.video?.url ? <><Play size={11} fill="currentColor" strokeWidth={0} /> Video</> : <><ImagePlay size={12} /> GIF</>}
@@ -139,12 +139,12 @@ export default function Journey({ category, places, lang, reviews, toolbar, onOp
 
         {!chapters.length && empty}
         {chapters.map((c) => {
-          const cover = c.items.find((p) => p.image?.src) || c.items[0]
+          const cover = c.items.find((p) => playableVideo(p)) || c.items.find((p) => p.image?.src) || c.items[0]
           const no = ORDER.indexOf(c.region)
           return (
             <section key={c.region} className={`chapter region-${c.region}`}>
               <header className="chapter-head">
-                <PlaceImage place={cover} animated />
+                <PlaceMedia place={cover} animated />
                 <div className="chapter-text">
                   <span className="chapter-no">{lang === 'vi' ? 'Chương' : 'Chapter'} {NUMERALS[no]}</span>
                   <h2>{REGIONS[c.region][lang]}</h2>
