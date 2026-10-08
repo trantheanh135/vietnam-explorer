@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import SEED from '../data/seed.json'
-import { directionsUrl, filterPlaces, googleMapsUrl, normalize } from './places'
+import { areaCounts, directionsUrl, distanceKm, filterPlaces, formatDistance, googleMapsUrl, nearby, normalize } from './places'
 import { setReview } from './reviews'
 
 describe('normalize', () => {
@@ -56,6 +56,28 @@ describe('Google Maps links', () => {
     expect(directionsUrl(pho)).toMatch(/\/maps\/dir\/\?api=1&destination=/)
     const halong = SEED.find((p) => p.id === 'ha-long-bay')
     expect(decodeURIComponent(googleMapsUrl(halong))).toContain('Vịnh Hạ Long, Quảng Ninh')
+  })
+})
+
+describe('areas and distances', () => {
+  it('counts areas, biggest first, and filters by area', () => {
+    const counts = areaCounts(SEED.filter((p) => p.category === 'food'))
+    expect(counts[0][1]).toBeGreaterThanOrEqual(counts[1][1])
+    const [area] = counts[0]
+    expect(filterPlaces(SEED, { category: 'food', area }).every((p) => p.area === area)).toBe(true)
+  })
+  it('measures distance and lists the closest places first', () => {
+    // Hoàn Kiếm Lake to the Cathedral: about 0.5 km.
+    expect(distanceKm({ lat: 21.0287, lng: 105.8523 }, { lat: 21.0287, lng: 105.8489 })).toBeCloseTo(0.35, 1)
+    const pho = SEED.find((p) => p.id === 'pho-thin')
+    const near = nearby(SEED, pho, { maxKm: 3 })
+    expect(near.every((x, i) => i === 0 || near[i - 1].km <= x.km)).toBe(true)
+    expect(near.some((x) => x.place.id === 'pho-thin')).toBe(false)
+  })
+  it('formats distances per language', () => {
+    expect(formatDistance(0.347, 'vi')).toBe('350 m')
+    expect(formatDistance(1.24, 'vi')).toBe('1,2 km')
+    expect(formatDistance(1.24, 'en')).toBe('1.2 km')
   })
 })
 
