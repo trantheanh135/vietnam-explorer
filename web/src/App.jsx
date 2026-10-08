@@ -203,7 +203,7 @@ export default function App() {
         </main>
       ) : (
         <main className="map-mode">
-          <MapView online={online} places={places} category={category} lang={lang} selected={preview || null} onSelect={setPreviewId} />
+          <MapView online={online} places={places} category={category} lang={lang} selected={preview || null} onSelect={setPreviewId} onOpen={open} />
           {preview && <MapPreview place={preview} lang={lang} onOpen={() => open(preview.id)} onClose={() => setPreviewId(null)} />}
         </main>
       )}

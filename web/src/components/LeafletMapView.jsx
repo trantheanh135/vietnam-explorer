@@ -1,8 +1,12 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents, ZoomControl } from 'react-leaflet'
 import { title, VIETNAM_CENTER } from '../lib/places'
+import PlaceHoverCard from './PlaceHoverCard'
+
+// Rich hover cards only where there is a real pointer; touch screens use the tap preview instead.
+const CAN_HOVER = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
 
 // Lucide "mountain" / "utensils" glyphs (ISC licence), drawn inside the pin.
 const GLYPH = {
@@ -36,7 +40,7 @@ function clusterIcon(category, count) {
 const CLUSTER_PX = 46
 
 /** Pins closer than CLUSTER_PX on screen merge into one numbered bubble (recomputed on zoom). */
-function Pins({ places, category, lang, selected, onSelect }) {
+function Pins({ places, category, lang, selected, onSelect, onHover, onLeave }) {
   const map = useMap()
   const [zoom, setZoom] = useState(map.getZoom())
   useMapEvents({ zoomend: () => setZoom(map.getZoom()) })
@@ -67,8 +71,11 @@ function Pins({ places, category, lang, selected, onSelect }) {
         if (g.items.length === 1) {
           const p = g.items[0]
           return (
-            <Marker key={p.id} position={[p.lat, p.lng]} icon={icons[p.category]} eventHandlers={{ click: () => onSelect(p.id) }}>
-              <Tooltip direction="top" className="pin-tip">{title(p, lang)}</Tooltip>
+            <Marker key={p.id} position={[p.lat, p.lng]} icon={icons[p.category]}
+              eventHandlers={CAN_HOVER
+                ? { click: () => onSelect(p.id), mouseover: () => onHover(p, map.latLngToContainerPoint([p.lat, p.lng])), mouseout: onLeave }
+                : { click: () => onSelect(p.id) }}>
+              {!CAN_HOVER && <Tooltip direction="top" className="pin-tip">{title(p, lang)}</Tooltip>}
             </Marker>
           )
         }
@@ -120,8 +127,39 @@ function Viewport({ places, selected }) {
   return null
 }
 
-export default function LeafletMapView({ places, category, lang, selected, onSelect }) {
+function CloseOnMove({ onMove }) {
+  useMapEvents({ movestart: onMove, zoomstart: onMove })
+  return null
+}
+
+/** Card above the pin, or below it when the pin is near the top; shifted to stay inside the map. */
+function cardStyle({ x, y }, box) {
+  const W = 290
+  const H = 330
+  const below = y < H + 40
+  return {
+    left: Math.min(Math.max(8, x - W / 2), (box?.clientWidth || 1e4) - W - 8),
+    top: below ? y + 14 : y - 52 - H,
+    width: W,
+  }
+}
+
+export default function LeafletMapView({ places, category, lang, selected, onSelect, onOpen }) {
+  const [hover, setHover] = useState(null) // { place, x, y } in map pixels
+  const hideTimer = useRef(null)
+  const box = useRef(null)
+  const show = (place, pt) => {
+    clearTimeout(hideTimer.current)
+    setHover({ place, x: pt.x, y: pt.y })
+  }
+  const hideSoon = () => {
+    clearTimeout(hideTimer.current)
+    hideTimer.current = setTimeout(() => setHover(null), 220)
+  }
+  useEffect(() => () => clearTimeout(hideTimer.current), [])
+
   return (
+    <div ref={box} style={{ position: 'relative', width: '100%', height: '100%' }}>
     <MapContainer center={[VIETNAM_CENTER.lat, VIETNAM_CENTER.lng]} zoom={5} zoomControl={false} style={{ width: '100%', height: '100%' }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -130,8 +168,15 @@ export default function LeafletMapView({ places, category, lang, selected, onSel
         maxZoom={19}
       />
       <ZoomControl position="bottomright" />
-      <Pins places={places} category={category} lang={lang} selected={selected} onSelect={onSelect} />
+      <Pins places={places} category={category} lang={lang} selected={selected} onSelect={onSelect} onHover={show} onLeave={hideSoon} />
       <Viewport places={places} selected={selected} />
+      <CloseOnMove onMove={() => setHover(null)} />
     </MapContainer>
+    {hover && (
+      <div className="map-hover" style={cardStyle(hover, box.current)} onMouseEnter={() => clearTimeout(hideTimer.current)} onMouseLeave={hideSoon}>
+        <PlaceHoverCard place={hover.place} lang={lang} onOpen={onOpen ? (id) => { setHover(null); onOpen(id) } : undefined} />
+      </div>
+    )}
+    </div>
   )
 }

@@ -524,3 +524,34 @@ h1, h2, h3 { letter-spacing: -.01em; }
   .bottom-nav .dot { position: absolute; top: 4px; left: calc(50% + 6px); font-style: normal; font-size: 10px; font-weight: 800; line-height: 16px; min-width: 16px; padding: 0 4px; border-radius: 999px; background: #e11d48; color: #fff; }
 }
 .detail-hero .ph-name, .detail-hero .ph-sub, .chapter-head .ph-name, .chapter-head .ph-sub { display: none !important; }
+
+/* ---------- Hover card (S-map dots and street-map pins) ---------- */
+.smap-hit { fill: transparent; }
+.smap-dot.hover .smap-dot-core { stroke: var(--accent); stroke-width: 4; r: 10px; }
+.smap-hover { position: fixed; z-index: 1800; width: 300px; animation: card-pop .18s ease-out both; }
+@keyframes card-pop { from { opacity: 0; transform: translateY(6px) scale(.98); } }
+.hover-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); color: var(--ink); text-align: left; }
+.hover-card.food { --accent: var(--food); --accent-2: var(--food-2); --accent-soft: var(--food-soft); }
+.hover-card.travel { --accent: var(--travel); --accent-2: var(--travel-2); --accent-soft: var(--travel-soft); }
+.hover-card-media { position: relative; height: 150px; }
+.hover-card-media .pimg { position: absolute; inset: 0; }
+.hover-card-region, .hover-card-rating {
+  position: absolute; z-index: 2; top: 10px; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;
+}
+.hover-card-region { left: 10px; color: #fff; background: rgba(0, 0, 0, .45); backdrop-filter: blur(6px); letter-spacing: .04em; }
+.hover-card-rating { right: 10px; background: rgba(255, 255, 255, .95); color: #1a1a1a; }
+.hover-card-rating svg { color: var(--star); }
+.hover-card-body { padding: 12px 14px 14px; display: grid; gap: 4px; }
+.hover-card-body b { font-family: var(--serif); font-size: 21px; line-height: 1.12; font-weight: 800; }
+.hover-card-body small { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.hover-card-body p { margin: 4px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+.hover-card-price { color: var(--accent-2) !important; font-weight: 700 !important; }
+.hover-card-open { justify-self: start; margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; border: 0; border-radius: 999px; padding: 7px 13px; background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; }
+.hover-card-open:hover { background: var(--accent-2); }
+.hover-card-others { margin-top: 8px; padding-top: 10px; border-top: 1px dashed var(--line); display: grid; gap: 2px; }
+.hover-card-others span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.hover-card-others button { border: 0; background: none; padding: 3px 0; text-align: left; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hover-card-others button:hover { color: var(--accent); }
+.hover-card-others em { font-style: normal; font-weight: 400; color: var(--muted); }
+.map-hover { position: absolute; z-index: 1100; animation: card-pop .18s ease-out both; }
+.map-hover .hover-card-media { height: 130px; }

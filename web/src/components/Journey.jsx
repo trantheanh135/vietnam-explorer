@@ -123,7 +123,7 @@ export default function Journey({ category, places, lang, reviews, toolbar, onOp
             <span>{t('yourJourney', lang)}</span>
             <b>{activeIndex >= 0 ? String(activeIndex + 1).padStart(2, '0') : '00'}<small> / {String(ordered.length).padStart(2, '0')}</small></b>
           </p>
-          <SMap places={ordered} activeId={activeId} lang={lang} onPick={pick} />
+          <SMap places={ordered} activeId={activeId} lang={lang} onPick={pick} onOpen={onOpen} />
           {active && <p className="journey-map-now">{REGIONS[active.region][lang]} · {active.area}</p>}
         </div>
       </aside>
